@@ -1,0 +1,8 @@
+{
+    "result":{
+        "action":"beer-style",
+        "parameters":{
+            "beer-style":"Ale"
+        }
+    }
+}
