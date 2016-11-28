@@ -5,6 +5,7 @@ from flask import request
 from flask import make_response
 from SemanticComponent import SemanticComponent
 import QueryCreator
+import AnswerMaker
 import config
 
 app = Flask(__name__)
@@ -16,14 +17,14 @@ def webhook():
     print('Request: ' + json.dumps(req, indent=4))
     result = processRequest(req)
     result = json.dumps(result, indent=4)
-    print(result)
     result_api = make_response(result)
     result_api.headers['Content-Type'] = 'application/json'
     return result_api
 
 
 def processRequest(req):
-    if req.get('result').get('action') not in config.API_AI_REQUESTS:
+    action = req.get('result').get('action') 
+    if action not in config.API_AI_REQUESTS:
         print('ACTION not possible')
         return{}
     sparql_query = convertToSPARQL(req)
@@ -31,7 +32,7 @@ def processRequest(req):
         print('PARAMETERS not GOOD')
         return {}
     data = semantic_component.query(sparql_query)
-    result = makeBeerioResult(data)
+    result = makeBeerioResult(action, data)
     return result
 
 def convertToSPARQL(data):
@@ -42,22 +43,16 @@ def convertToSPARQL(data):
     query = QueryCreator.createQuery(action, params)
     return query
 
-def makeBeerioResult(data):
-    result = data[0].get('result')
-    if result is None:
+def makeBeerioResult(action, data):
+    # result = data[0].get('result')
+    if data is None:
         return {}
-    speech = "The style you are looking for is from " + result.get('value')
+    fullfillment = AnswerMaker.createAnswer(action, data)
 
     print("Response:")
-    print(speech)
+    print(fullfillment)
 
-    return {
-        "speech": speech,
-        "displayText": speech,
-        # "data": data,
-        # "contextOut": [],
-        "source": "apiai-beerio-webhook-sample"
-    }
+    return fullfillment
 
 if __name__ == '__main__':
     semantic_component = SemanticComponent(config.SPARQL_LOB_ENDPOINT)

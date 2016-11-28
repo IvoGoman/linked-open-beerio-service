@@ -1,6 +1,6 @@
 def createQuery(action, parameters):
     return {
-        'getStyleDescription' : createStyleQuery(parameters)
+        'getBeerByStyle' : createBeerByStyleQuery(parameters)
     }[action]
 
 
@@ -16,6 +16,20 @@ def createStyleQuery(parameters):
   
     return (query % parameters.get('beer-style'))
 
+def createBeerByStyleQuery(parameters):
+    query = """
+            PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
+            select ?b ?label ?score where {
+            ?bs rdfs:label "%s" .
+            ?b lob:hasStyle ?bs ;
+                lob:hasScore ?score .
+            ?b rdfs:label ?label .
+            } 
+            order by desc(?score)
+            limit 3
+            """
+  
+    return (query % parameters.get('beer-style'))
 
 #       query = """
 #     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
