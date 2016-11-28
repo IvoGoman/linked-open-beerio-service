@@ -7,10 +7,9 @@ def createAnswer(action, data):
 
 def createBeerByStyleAnswer(data):
     title = "Which one do you like?"
-    choices =''
+    choices = []
     for x in data:
-        choices += '"' + x['label']['value'] + '", '
-    choices = choices[:-2]
+        choices.append(x['label']['value'])
 
     return {
         "speech": "",
