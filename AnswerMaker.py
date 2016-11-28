@@ -16,9 +16,9 @@ def createBeerByStyleAnswer(data):
         "messages":[
             {
                 "title":title,
-                "replies":[
+                "replies":
                     choices
-                ],
+                ,
                 "type":2
             }
         ],
