@@ -3,22 +3,8 @@ def create_query(action, parameters):
     return {
         'getBeerByStyle'    : create_beer_by_style_query,
         'getBeerByName'     : create_beer_by_name_query,
-        'getBeerByBrewery'  : create_beer_by_brewery_query 
+        'getBeerByBrewery'  : create_beer_by_brewery_query
     }[action](parameters)
-
-
-def create_style_query(parameters):
-    """ Returns a SPARQL query filled in with parameters"""
-    query = """
-            PREFIX lod: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
-            PREFIX sty: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/styles/>
-            select ?result WHERE { 
-            ?result a lod:BeerStyles .
-            ?result rdfs:label "%s".
-            }  limit 100
-            """
-
-    return query % parameters.get('beer-style')
 
 def create_beer_by_style_query(parameters):
     """ Returns a SPARQL query filled in with parameters"""
@@ -34,7 +20,7 @@ def create_beer_by_style_query(parameters):
             order by desc(?score)
             limit 3
             """
-    return query % parameters.get('beer-style')
+    return query % parameters.get('beer-style').replace('...', '')
 
 def create_beer_by_name_query(parameters):
     """ Returns a SPARQL query filled in with parameters"""
@@ -55,7 +41,7 @@ def create_beer_by_name_query(parameters):
             } 
             limit 1
             """
-    return query % parameters.get('beer-name')
+    return query % parameters.get('beer-name').replace('...', '')
 
 def create_beer_by_brewery_query(parameters):
     """ Returns a SPARQL query filled in with parameters"""
@@ -72,4 +58,4 @@ def create_beer_by_brewery_query(parameters):
             order by desc(?score)
             limit 3
             """
-    return query % parameters.get('brewery-name')
+    return query % parameters.get('brewery-name').replace('...', '')

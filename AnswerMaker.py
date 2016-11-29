@@ -2,6 +2,8 @@
 
 def create_answer(action, data):
     """ Invokes answer creation for data based on action"""
+    if not data :
+        return create_reply("Sorry, I did not what you are talking about.")
     return {
         'getBeerByStyle'    :   create_beer_by_style_answer,
         'getBeerByName'     :   create_beer_by_name_answer,
