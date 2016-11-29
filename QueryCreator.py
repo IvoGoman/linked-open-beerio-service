@@ -3,7 +3,9 @@ def create_query(action, parameters):
     return {
         'getBeerByStyle'    : create_beer_by_style_query,
         'getBeerByName'     : create_beer_by_name_query,
-        'getBeerByBrewery'  : create_beer_by_brewery_query
+        'getBeerByBrewery'  : create_beer_by_brewery_query,
+        'getBeerByCountry'  : create_beer_by_country_query,
+        'getStyleByName'    : create_style_by_name_query
     }[action](parameters)
 
 def create_beer_by_style_query(parameters):
@@ -59,3 +61,33 @@ def create_beer_by_brewery_query(parameters):
             limit 3
             """
     return query % parameters.get('brewery-name').replace('...', '')
+
+def create_style_by_name_query(parameters):
+    """ Returns a SPARQL query filled in with parameters """
+    query = """
+            PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
+            select ?s, ?description  where {
+            ?s rdfs:label "%s" .
+            ?s rdfs:comment ?description.
+            } 
+            """
+    return query % parameters.get('style-name').replace('...', '')
+
+def create_beer_by_country_query(parameters):
+    """ Returns a SPARQL query filled in with parameters """
+    query = """
+            PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
+            PREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>
+            select ?beer, ?label, ?score, ?country  where {
+            ?b vcard:hasCountryName ?y .
+
+            ?beer lob:brewedBy ?b ;
+                  lob:hasScore ?score .
+            ?beer rdfs:label ?label.
+            ?b vcard:hasCountryName ?country .
+            FILTER regex(?y, "%s", "i")
+            }
+            order by desc(?score)
+            limit 3
+    """
+    return query % parameters.get('beer-country').replace('...', '')
