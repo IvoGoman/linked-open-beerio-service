@@ -14,22 +14,22 @@ def create_query(action, parameters):
         'getBeerStyle'      : create_beerstyle_query
     }[action](parameters)
 
-def create_beer_by_style_query(parameters):
-    """ Returns a SPARQL query filled in with parameters"""
-    query = """
-            PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
-            select ?b ?label ?score where {
-            ?bs rdfs:label ?y .
-            ?b lob:hasStyle ?bs ;
-                lob:hasScore ?score .
-            ?b rdfs:label ?label .
-            FILTER regex(?y, "%s", "i")
-             FILTER ( 1 >  <bif:rnd> (2, ?b)) .
-            }
-            order by desc(?score)
-            limit 3
-            """
-    return query % parameters.get('beer-style').replace('...', '')
+# def create_beer_by_style_query(parameters):
+#     """ Returns a SPARQL query filled in with parameters"""
+#     query = """
+#             PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
+#             select ?b ?label ?score where {
+#             ?bs rdfs:label ?y .
+#             ?b lob:hasStyle ?bs ;
+#                 lob:hasScore ?score .
+#             ?b rdfs:label ?label .
+#             FILTER regex(?y, "%s", "i")
+#              FILTER ( 1 >  <bif:rnd> (2, ?b)) .
+#             }
+#             order by desc(?score)
+#             limit 3
+#             """
+#     return query % parameters.get('beer-style').replace('...', '')
 
 def create_beer_by_name_query(parameters):
     """ Returns a SPARQL query filled in with parameters"""
@@ -163,8 +163,8 @@ def create_brewery_by_name_query(parameters):
             ?bs rdfs:label ?y .
             ?bs a lob:Brewery.
             ?bs rdfs:label ?brewery .
-            dbo:?y (owl:sameAs|^owl:sameAs) ?x .
-            FILTER regex(?y, "Eichbaum", "i") .
+            dbo:?y owl:sameAs ?x .
+            FILTER regex(?y, "Birra Menabrea SPA", "i") .
             } 
             limit 3
             """
@@ -214,38 +214,55 @@ def create_beer_query(parameters):
     query = query_start + options + query_end
     return query
 
-def create_beerstyle_query(parameters):
-    query_start = """
-             PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
-            select ?s, ?label  where {
-            ?s rdfs:label ?label .
-            ?s a lob:BeerStyles .
-            """
-
-    query_end = """
-            FILTER ( 1 >  <bif:rnd> (2, ?s))
+def create_beer_by_style_query(parameters):
+    query = """
+            PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
+            select ?blabel, ?slabel, ?desc  where {
+            ?s rdfs:label ?x .
+            ?s rdfs:label ?slabel .
+            ?s a lob:BeerStyle . 
+            ?s rdfs:comment ?desc .
+            ?b lob:hasStyle ?s ;
+                lob:hasScore ?score .
+            ?b rdfs:label ?blabel .
+            FILTER regex(?x, "%s", "i"). 
+            FILTER ( 1 >  <bif:rnd> (2, ?s))           
             }
+            order by desc(?score)
             limit 3 
             """
+    return query % parameters.get('beer-style')
 
+def create_beerstyle_query(parameters):
+    query_start = """
+            PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
+            select ?label where {
+            ?s rdfs:label ?label .
+            """
+    query_end = """
+            FILTER ( 1 >  <bif:rnd> (2, ?s))           
+            }
+            limit 3
+            """
     options = ''
     if parameters.get('beer-style-color'):
         options += """
-                    ?s lob:color ?y .
+                    ?s lob:hasColor ?y .
                     FILTER regex(?y, "{}", "i") . 
                    """.format(parameters.get('beer-style-color'))
 
     if parameters.get('beer-style-flavor'):
         options += """
-                    ?s lob:flavor ?x .
+                    ?s lob:hasFlavor ?x .
                     FILTER regex(?x, "{}", "i") . 
                    """.format(parameters.get('beer-style-flavor'))
 
     if parameters.get('beer-style-bitterness'):
         options += """
-                    ?s lob:bitternes ?z .
+                    ?s lob:hasBitterness ?z .
                     FILTER regex(?z, "{}", "i") .
                    """.format(parameters.get('beer-style-bitterness'))
 
     query = query_start + options + query_end
     return query
+
