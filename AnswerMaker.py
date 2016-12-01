@@ -11,7 +11,8 @@ def create_answer(action, data):
         'getBreweryByCity'  :   create_brewery_by_locality_answer,
         'getBreweryByCountry':   create_brewery_by_locality_answer,
         'getStyleByName'    :   create_style_by_name_answer,
-        'getBeer'           :   create_get_beer_answer
+        'getBeer'           :   create_beer_answer,
+        'getBeerStyle'      :   create_beerstyle_answer
     }[action](data)
 
 def create_beer_by_style_answer(data):
@@ -67,12 +68,17 @@ def create_brewery_by_locality_answer(data):
         text += x['label']['value'] + ", "
     return create_reply(text[:-2]+".")
 
-def create_get_beer_answer(data):
+def create_beer_answer(data):
     text = "These beers match your criteria: "
     for x in data:
         text += x['b']['value'] + ", "
     return create_reply(text[:-2]+".")
 
+def create_beerstyle_answer(data):
+    text = "These are styles that match your criteria: "
+    for x in data:
+        text += x['label']['value'] + ", "
+    return create_reply(text[:-2]+".")
 
 def create_quick_reply(title, choices):
     """ Returns a fullfillment string for quick replies"""

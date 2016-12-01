@@ -11,9 +11,8 @@ The result of these queries is then put into a format that can be displayed to t
 - getBeerByCity(beer-city)
 - getBeerByCountry(beer-country)
 - getBreweryByCity(brewery-city)
-
+- getBeer(beer-style-color, beer-style-flavor, beer-style-bitterness, beer-country, beer-style)
 ## Intents TODOs
 
 - getBreweryByName(brewery-name)
-- getBeer(beer-style-color, beer-style-flavor, beer-style-bitterness, beer-country, beer-style)
 - getBeerStyle(beer-style-color, beer-style-flavor, beer-style-bitterness)
