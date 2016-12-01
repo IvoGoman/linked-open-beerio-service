@@ -12,7 +12,8 @@ def create_answer(action, data):
         'getBreweryByCountry':   create_brewery_by_locality_answer,
         'getStyleByName'    :   create_style_by_name_answer,
         'getBeer'           :   create_beer_answer,
-        'getBeerStyle'      :   create_beerstyle_answer
+        'getBeerStyle'      :   create_beerstyle_answer,
+        'getBreweryByName'  :   create_brewery_by_name_answer
     }[action](data)
 
 def create_beer_by_name_answer(data):
@@ -38,13 +39,6 @@ def create_style_by_name_answer(data):
     """ Makes an answer string containing data """
     text = data[0]["style"]["value"]
     return create_reply(text)
-
-def create_beer_by_country_answer(data):
-    """ Makes an answer string containing data """
-    text = "These are the top beers brewed in " + data[0]['country']['value'] + ": "
-    for x in data:
-        text += x['label']['value'] + ", "
-    return create_reply(text[:-2]+".")
 
 def create_beer_by_locality_answer(data):
     """ Makes an answer string containing data """
@@ -85,6 +79,10 @@ def create_beerstyle_answer(data):
         choices.append(x['label']['value'])
     text = text[:-2] + " Which one would you like to know more about?"
     return create_quick_reply(text, choices)
+
+def create_brewery_by_name_answer(data):
+    text = data[0]['abstract']['value']
+    return create_reply(text)
 
 def create_quick_reply(title, choices):
     """ Returns a fullfillment string for quick replies"""

@@ -14,22 +14,6 @@ def create_query(action, parameters):
         'getBeerStyle'      : create_beerstyle_query
     }[action](parameters)
 
-# def create_beer_by_style_query(parameters):
-#     """ Returns a SPARQL query filled in with parameters"""
-#     query = """
-#             PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
-#             select ?b ?label ?score where {
-#             ?bs rdfs:label ?y .
-#             ?b lob:hasStyle ?bs ;
-#                 lob:hasScore ?score .
-#             ?b rdfs:label ?label .
-#             FILTER regex(?y, "%s", "i")
-#              FILTER ( 1 >  <bif:rnd> (2, ?b)) .
-#             }
-#             order by desc(?score)
-#             limit 3
-#             """
-#     return query % parameters.get('beer-style').replace('...', '')
 
 def create_beer_by_name_query(parameters):
     """ Returns a SPARQL query filled in with parameters"""
@@ -153,20 +137,22 @@ def create_brewery_by_country_query(parameters):
     """
     return query % parameters.get('brewery-country').replace('...', '')
 
-# TODO: Extend Query with the owl:sameAs Property to get the Abstract from DBpedia 
 def create_brewery_by_name_query(parameters):
     query = """
-            PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
+         PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
             PREFIX owl: <https://www.w3.org/TR/owl-ref/#>
             PREFIX dpo: <http://dbpedia.org/ontology/>
-            select *  where {
+            select ?brewery, ?abstract  where {
             ?bs rdfs:label ?y .
             ?bs a lob:Brewery.
             ?bs rdfs:label ?brewery .
-            dbo:?y owl:sameAs ?x .
-            FILTER regex(?y, "Birra Menabrea SPA", "i") .
+            ?bs owl:sameAs ?x .
+            SERVICE <http://dbpedia.org/sparql> { 
+            ?x dpo:abstract ?abstract
+             FILTER (lang(?abstract) = 'en')
+            }
+            FILTER regex(?y, "%s", "i") .
             } 
-            limit 3
             """
     return query % parameters.get('brewery-name').replace('...', '')
 

@@ -3,4 +3,4 @@ SPARQL_DBPEDIA_ENDPOINT = 'https://dbpedia.org/sparql'
 
 API_AI_REQUESTS = [ 'getBeerByName', 'getBeerByBrewery', 'getBeerByCountry',\
                    'getBeerByCity', 'getBreweryByCity', 'getBreweryByCountry', 'getBeer',\
-                   'getBeerStyle']
+                   'getBeerStyle', 'getBreweryByName', 'getStyleByName', 'getBeerByStyle']
