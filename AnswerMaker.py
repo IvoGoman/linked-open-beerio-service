@@ -56,9 +56,11 @@ def create_brewery_by_locality_answer(data):
 
 def create_beer_answer(data):
     text = "These beers match your criteria: "
+    choices = []
     for x in data:
         text += x['b']['value'] + ", "
-    return create_reply(text[:-2]+".")
+        choices.append(x['b']['value'])
+    return create_quick_reply(text[:-2]+".", choices)
 
 def create_beer_by_style_answer(data):
     text = """{} is {}. These are the three best {}s that I could find for you:
