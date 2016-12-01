@@ -162,7 +162,7 @@ def create_beer_query(parameters):
             select ?b where {
             """
     query_end = """
-            ?s a lob:BeerStyles .
+            ?s a lob:BeerStyle .
             ?beer rdf:type ?s .
             ?beer a lob:Beer.
             ?beer rdfs:label ?b . 
