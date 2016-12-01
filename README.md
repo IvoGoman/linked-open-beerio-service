@@ -8,10 +8,12 @@ The result of these queries is then put into a format that can be displayed to t
 - getBeerByName(beer-name)
 - getStyleByName(style-name)
 - getBreweryByCountry(brewery-country)
-## Intents TODOs
 - getBeerByCity(beer-city)
 - getBeerByCountry(beer-country)
 - getBreweryByCity(brewery-city)
-- getBeerByBitterness (beer-bitterness)
-- getBeerByFlavor (beer-flavor)
-- getBeerByColor (beer-color)
+
+## Intents TODOs
+
+- getBreweryByName(brewery-name)
+- getBeer(beer-style-color, beer-style-flavor, beer-style-bitterness, beer-country, beer-style)
+- getBeerStyle(beer-style-color, beer-style-flavor, beer-style-bitterness)

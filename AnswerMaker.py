@@ -10,7 +10,8 @@ def create_answer(action, data):
         'getBeerByCountry'  :   create_beer_by_locality_answer,
         'getBreweryByCity'  :   create_brewery_by_locality_answer,
         'getBreweryByCountry':   create_brewery_by_locality_answer,
-        'getStyleByName'    :   create_style_by_name_answer
+        'getStyleByName'    :   create_style_by_name_answer,
+        'getBeer'           :   create_get_beer_answer
     }[action](data)
 
 def create_beer_by_style_answer(data):
@@ -64,6 +65,12 @@ def create_brewery_by_locality_answer(data):
     text = "These are breweries that are located in " + data[0]['locality']['value'] + ": "
     for x in data:
         text += x['label']['value'] + ", "
+    return create_reply(text[:-2]+".")
+
+def create_get_beer_answer(data):
+    text = "These beers match your criteria: "
+    for x in data:
+        text += x['b']['value'] + ", "
     return create_reply(text[:-2]+".")
 
 

@@ -8,7 +8,8 @@ def create_query(action, parameters):
         'getBeerByCountry'  : create_beer_by_country_query,
         'getBreweryByCity'  : create_brewery_by_city_query,
         'getBreweryByCountry': create_brewery_by_country_query,
-        'getStyleByName'    : create_style_by_name_query
+        'getStyleByName'    : create_style_by_name_query,
+        'getBeer'           : create_get_beer_query
     }[action](parameters)
 
 def create_beer_by_style_query(parameters):
@@ -150,31 +151,66 @@ def create_brewery_by_country_query(parameters):
     """
     return query % parameters.get('brewery-country').replace('...', '')
 
+# TODO: Extend Query with the owl:sameAs Property to get the Abstract from DBpedia 
 def create_brewery_by_name_query(parameters):
     query = """
             PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
-            select ?brewery  where {
+            PREFIX owl: <https://www.w3.org/TR/owl-ref/#>
+            PREFIX dpo: <http://dbpedia.org/ontology/>
+            select *  where {
             ?bs rdfs:label ?y .
-            ?bs a lob:brewery.
-            ?bs rdfs:label ?brewery .   
-            FILTER regex(?y, "Eichbaum", "i")
-            FILTER ( 1 >  <bif:rnd> (2, ?b)) 
+            ?bs a lob:Brewery.
+            ?bs rdfs:label ?brewery .
+            dbo:?y (owl:sameAs|^owl:sameAs) ?x .
+            FILTER regex(?y, "Eichbaum", "i") .
             } 
             limit 3
             """
     return query % parameters.get('brewery-name').replace('...', '')
 
 def create_get_beer_query(parameters):
-    query = """
+    query_start = """
             PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
-            select ?beer where {
-            {}
+            select ?b where {
+            """
+    query_end = """
+            ?s a lob:BeerStyles .
+            ?beer rdf:type ?s .
+            ?beer a lob:Beer.
+            ?beer rdfs:label ?b . 
+            FILTER ( 1 >  <bif:rnd> (2, ?beer)) 
             }
             limit 3
             """
+            
     options = ''
             # , beer-style-flavor, beer-style-bitterness, beer-country, beer-style
+    if parameters.get('beer-style-bitterness'):
+        options += """ 
+                    ?s lob:bitternes ?x .
+                    FILTER regex(?x, "{}", "i") . 
+                   """.format(parameters.get('beer-style-bitterness'))
     if parameters.get('beer-style-color'):
-        options += '?b lob:hasColor'
+        options += """ 
+                     ?s lob:color ?y .
+                     FILTER regex(?y, "{}", "i"). 
+                     """.format(parameters.get('beer-style-color'))
+    if parameters.get('beer-style-flavor'):
+        options += """ 
+                     ?s lob:flavor ?z .
+                     FILTER regex(?z, "{}", "i"). 
+                     """.format(parameters.get('beer-style-flavor'))
+    if parameters.get('beer-style'):
+        options += """ 
+                     ?s rdfs:label ?a .
+                     FILTER regex(?a, "{}", "i"). 
+                     """.format(parameters.get('beer-style'))
+    if parameters.get('beer-country'):
+        options += """
+                   ?b vcard:hasCountryName ?c .
+                   ?beer lob:brewedBy ?b ;
+                   """.format(parameters.get('beer-country'))
+    query = query_start + options + query_end
+    print(query)
     return query
 
