@@ -1,3 +1,6 @@
+from SemanticComponent import SemanticComponent
+import Config as config
+
 def create_query(action, parameters):
     """ Invokes sparql query creation for action"""
     return {
@@ -18,15 +21,15 @@ def create_query(action, parameters):
 def create_beer_by_name_query(parameters):
     """ Returns a SPARQL query filled in with parameters"""
     query = """
-            PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
+           PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
             select ?b, ?label, ?score, ?abv, ?style, ?brewery,?rank, ?stylecount  where {
-            ?b rdfs:label ?y ;
-                lob:hasScore ?score ;
-                lob:hasABV ?abv;
-                lob:hasStyle ?styleuri;
-                lob:brewedBy ?breweryuri ;
-                lob:hasStyleRank ?rank;
-                lob:hasStyleCount ?stylecount.
+            ?b rdfs:label ?y .
+               OPTIONAL { ?b lob:hasScore ?score }
+               ?b lob:hasABV ?abv .
+               ?b lob:brewedBy ?breweryuri .
+               ?b rdf:type ?styleuri.
+               OPTIONAL { ?b lob:hasStyleRank ?rank }
+               OPTIONAL { ?b lob:hasStyleCount ?stylecount }
             ?b rdfs:label ?label .
             ?styleuri rdfs:label ?style .
             ?breweryuri rdfs:label ?brewery .
@@ -43,7 +46,7 @@ def create_beer_by_brewery_query(parameters):
             select ?b, ?label, ?score, ?brewery  where {
             ?bs rdfs:label ?y .
             ?b lob:brewedBy ?bs ;
-                lob:hasScore ?score .
+               lob:hasScore ?score .
             ?b rdfs:label ?label .
             ?bs rdfs:label ?brewery .   
             FILTER regex(?y, "%s", "i")
@@ -140,7 +143,7 @@ def create_brewery_by_country_query(parameters):
 def create_brewery_by_name_query(parameters):
     query = """
          PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
-            PREFIX owl: <https://www.w3.org/TR/owl-ref/#>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
             PREFIX dpo: <http://dbpedia.org/ontology/>
             select ?brewery, ?abstract  where {
             ?bs rdfs:label ?y .
@@ -148,12 +151,37 @@ def create_brewery_by_name_query(parameters):
             ?bs rdfs:label ?brewery .
             ?bs owl:sameAs ?x .
             SERVICE <http://dbpedia.org/sparql> { 
-            ?x dpo:abstract ?abstract
-             FILTER (lang(?abstract) = 'en')
+            ?x dpo:abstract ?abstract .
+             FILTER (lang(?abstract) = 'en') .
             }
             FILTER regex(?y, "%s", "i") .
             } 
+            limit 1
             """
+    query = query % parameters.get('brewery-name').replace('...', '')
+    SPARQL = SemanticComponent(config.SPARQL_LOB_ENDPOINT)
+    data = SPARQL.query(query)
+    if not data:
+        query = create_brewery_by_name_alternative_query(parameters)
+    return query
+
+
+def create_brewery_by_name_alternative_query(parameters):
+    query = """
+            PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
+            PREFIX owl: <https://www.w3.org/TR/owl-ref/#>
+            PREFIX dpo: <http://dbpedia.org/ontology/>
+            PREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>
+            select ?brewery, ?avgrating, ?country, ?city where {
+            ?bs rdfs:label ?y .
+            ?bs a lob:Brewery .
+            ?bs rdfs:label ?brewery .
+            OPTIONAL {?bs lob:hasAverageRating ?avgrating }
+            OPTIONAL {?bs vcard:hasLocality ?city }
+            OPTIONAL {?bs vcard:hasCountryName ?country }
+            FILTER regex(?y, "%s", "i") .
+  } 
+    """
     return query % parameters.get('brewery-name').replace('...', '')
 
 def create_beer_query(parameters):
@@ -204,18 +232,17 @@ def create_beer_by_style_query(parameters):
     query = """
             PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
             select ?blabel, ?slabel, ?desc  where {
-            ?s rdfs:label ?x .
             ?s rdfs:label ?slabel .
             ?s a lob:BeerStyle . 
             ?s rdfs:comment ?desc .
-            ?b lob:hasStyle ?s ;
+            ?b a ?s ;
                 lob:hasScore ?score .
             ?b rdfs:label ?blabel .
-            FILTER regex(?x, "%s", "i"). 
+            FILTER regex(?slabel, "%s", "i"). 
             FILTER ( 1 >  <bif:rnd> (2, ?s))           
             }
             order by desc(?score)
-            limit 3 
+            limit 3
             """
     return query % parameters.get('beer-style')
 

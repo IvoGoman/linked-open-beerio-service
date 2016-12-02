@@ -21,7 +21,8 @@ def create_beer_by_name_answer(data):
     resp = "{} is a {} brewed by {} and has {}% ABV."
     resp = resp.format(data[0]['label']['value'], data[0]['style']['value'],\
             data[0]['brewery']['value'], data[0]['abv']['value'])
-    resp += " Furthermore it positions itself at rank {} out of {} {}s with a score of {}."\
+    if 'score' in data[0] and 'rank' in data[0] and 'stylecount' in data[0]:
+        resp += " Furthermore it positions itself at rank {} out of {} {}s with a score of {}."\
             .format(data[0]['rank']['value'], data[0]['stylecount']['value'], \
             data[0]['style']['value'], data[0]['score']['value'])
     return create_reply(resp)
@@ -65,7 +66,7 @@ def create_beer_answer(data):
 def create_beer_by_style_answer(data):
     text = """{} is {}. These are the three best {}s that I could find for you:
             {}, {}, and {}. Which one would you like?"""
-    text.format(data[0]['slabel']['value'], data['desc']['value'], data[0]['slabel']['value'],\
+    text.format(data[0]['slabel']['value'], data[0]['desc']['value'], data[0]['slabel']['value'],\
         data[0]['blabel']['value'], data[1]['blabel']['value'], data[2]['blabel']['value'])
     choices = []
     for x in data:
@@ -83,7 +84,15 @@ def create_beerstyle_answer(data):
     return create_quick_reply(text, choices)
 
 def create_brewery_by_name_answer(data):
-    text = data[0]['abstract']['value']
+    item = data[0]
+    text = ''
+    if 'abstract' in item:
+        text += data[0]['abstract']['value']
+        text.encode('utf-8')
+    elif 'city' in item and 'country' in item:
+        text += item['brewery']['value'] + "is a brewery. "
+        text += "It is located in {}, {}.".format(item['city']['value'], item['country']['value'])
+
     return create_reply(text)
 
 def create_quick_reply(title, choices):
