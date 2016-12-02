@@ -2,6 +2,10 @@
 This service creates SPARQL queries based on the requests send by beerio, our chatbot on api.ai.
 The result of these queries is then put into a format that can be displayed to the user.
 
+## How to use
+- python3 ServiceEndpoint.py
+- make sure that port 5000 is open, as the webhook communicates via this port
+
 ## Intents Implemented
 - getBeerByStyle(beer-style)
 - getBeerByBrewery(brewery-name)
@@ -12,7 +16,7 @@ The result of these queries is then put into a format that can be displayed to t
 - getBeerByCountry(beer-country)
 - getBreweryByCity(brewery-city)
 - getBeer(beer-style-color, beer-style-flavor, beer-style-bitterness, beer-country, beer-style)
-## Intents TODOs
-
 - getBreweryByName(brewery-name)
+
+## Intents TODOs
 - getBeerStyle(beer-style-color, beer-style-flavor, beer-style-bitterness)

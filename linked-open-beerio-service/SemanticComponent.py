@@ -1,5 +1,4 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
-import config
 import logging
 
 class SemanticComponent():

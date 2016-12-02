@@ -6,7 +6,7 @@ from flask import make_response
 from SemanticComponent import SemanticComponent
 import QueryCreator
 import AnswerMaker
-import config
+import Config as config
 
 app = Flask(__name__)
 
