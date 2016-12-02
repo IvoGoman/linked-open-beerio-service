@@ -26,9 +26,12 @@ def webhook():
 def process_request(req):
     """ Processes req and returns fullfillment """
     action = req.get('result').get('action')
+    parameters = req.get('result').get('parameters').get('beer-name')
     if action not in config.API_AI_REQUESTS:
         print('ACTION not possible')
         return{}
+    if  'getBeerByName' in  action  and 'Becks Green Lemon' in parameters:
+        return AnswerMaker.create_reply("Waaaah I would not touch Green Lemon with a stick")
     sparql_query = convert_to_sparql(req)
     if sparql_query is None:
         print('PARAMETERS not GOOD')
