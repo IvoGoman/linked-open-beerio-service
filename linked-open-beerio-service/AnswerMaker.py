@@ -38,7 +38,10 @@ def create_beer_by_brewery_answer(data):
 
 def create_style_by_name_answer(data):
     """ Makes an answer string containing data """
-    text = data[0]["style"]["value"]
+    if data[0]['description']['value']:
+        text = data[0]['description']['value']
+    else:
+        text = "Sorry lad I don't know anything about " + data[0]['style']['value']
     return create_reply(text)
 
 def create_beer_by_locality_answer(data):
@@ -56,6 +59,7 @@ def create_brewery_by_locality_answer(data):
     return create_reply(text[:-2]+".")
 
 def create_beer_answer(data):
+    """ Makes an answer string containing data """
     text = "These beers match your criteria: "
     choices = []
     for x in data:
