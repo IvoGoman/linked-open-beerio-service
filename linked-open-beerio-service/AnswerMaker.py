@@ -68,9 +68,9 @@ def create_beer_answer(data):
     return create_quick_reply(text[:-2]+".", choices)
 
 def create_beer_by_style_answer(data):
-    text = """{}. These are the three best {}s that I could find for you:
+    text = """These are the three best {}s that I could find for you:
             {}, {}, and {}. Which one would you like?"""
-    text = text.format(data[0]['desc']['value'], data[0]['slabel']['value'],\
+    text = text.format(data[0]['slabel']['value'],\
         data[0]['blabel']['value'], data[1]['blabel']['value'], data[2]['blabel']['value'])
     choices = []
     for x in data:
