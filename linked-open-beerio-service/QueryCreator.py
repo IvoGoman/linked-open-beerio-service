@@ -61,9 +61,10 @@ def create_style_by_name_query(parameters):
     """ Returns a SPARQL query filled in with parameters """
     query = """
             PREFIX lob: <http://dws.informatik.uni-mannheim.de/swt/linked-open-beer/ontology/>
-            select ?s, ?description  where {
+            select ?style, ?description  where {
             ?s rdfs:label "%s" .
             ?s rdfs:comment ?description.
+            ?s rdfs:label ?style .
             } 
             """
     return query % parameters.get('style-name').replace('...', '')
